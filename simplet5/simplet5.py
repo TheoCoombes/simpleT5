@@ -17,6 +17,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 from pytorch_lightning.callbacks.progress import TQDMProgressBar
+from typing import Union
 
 torch.cuda.empty_cache()
 pl.seed_everything(42)
@@ -320,7 +321,7 @@ class SimpleT5:
         target_max_token_len: int = 512,
         batch_size: int = 8,
         max_epochs: int = 5,
-        use_gpu: bool = True,
+        use_gpu: Union[bool, int] = True,
         outputdir: str = "outputs",
         early_stopping_patience_epochs: int = 0,  # 0 to disable early stopping feature
         precision=32,
@@ -376,7 +377,10 @@ class SimpleT5:
             callbacks.append(early_stop_callback)
 
         # add gpu support
-        gpus = 1 if use_gpu else 0
+        if isinstance(use_gpu, bool):
+            gpus = 1 if use_gpu else 0
+        else:
+            gpus = use_gpu
 
         # add logger
         loggers = True if logger == "default" else logger
